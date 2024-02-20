@@ -29,3 +29,9 @@ let existe predicado lista =
   | Not_found -> false
 
 ;;
+
+
+let asociado lista clave =
+  let predicado (k, _) = k = clave in
+  let (k, v) = primero_que_cumple predicado lista in
+  v;;
