@@ -12,7 +12,7 @@ let rec primero_que_cumple f l =
 
 		
 
-(*val primero_que_cumple : ('a list -> bool) -> 'a list list -> 'a list = <fun>*)
+(*val primero_que_cumple : ('a -> bool) -> 'a list -> 'a = <fun>*)
 
 
 
