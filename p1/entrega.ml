@@ -60,7 +60,132 @@ let es_afd af =
 
 (* Ejercicio 2 *)
 
+(* Elementos para probar*)
 
+(*
+let eq_afne = Af (
+    Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"; Estado "4"],
+
+    Conjunto [Terminal "a"; Terminal "b"],
+
+    Estado "0",
+
+    Conjunto [
+      Arco_af (Estado "0", Estado "3", Terminal "a");
+      Arco_af (Estado "0", Estado "1", Terminal "");
+      Arco_af (Estado "1", Estado "2", Terminal "");
+      Arco_af (Estado "1", Estado "2", Terminal "a");
+      Arco_af (Estado "3", Estado "4", Terminal "b");
+      Arco_af (Estado "4", Estado "0", Terminal "b");
+      Arco_af (Estado "4", Estado "1", Terminal "")
+    ],
+
+    Conjunto [Estado "2"]
+  );;
+
+let eq_afn = Af (
+    Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"; Estado "4"],
+
+    Conjunto [Terminal "a"; Terminal "b"],
+
+    Estado "0",
+
+    Conjunto [
+      Arco_af (Estado "0", Estado "3", Terminal "a");
+      Arco_af (Estado "0", Estado "2", Terminal "a");
+      Arco_af (Estado "1", Estado "2", Terminal "a");
+      Arco_af (Estado "3", Estado "1", Terminal "b");
+      Arco_af (Estado "3", Estado "2", Terminal "b");
+      Arco_af (Estado "3", Estado "4", Terminal "b");
+      Arco_af (Estado "4", Estado "1", Terminal "b");
+      Arco_af (Estado "4", Estado "2", Terminal "a");
+      Arco_af (Estado "4", Estado "2", Terminal "b");
+      Arco_af (Estado "4", Estado "0", Terminal "b");
+      ],
+
+    Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "4";]
+  );;
+
+
+let eq_afd = Af (
+    Conjunto [Estado "0"; Estado "23"; Estado "124"; Estado "2"; Estado "012"],
+
+    Conjunto [Terminal "a"; Terminal "b"],
+
+    Estado "0",
+
+    Conjunto [
+      Arco_af (Estado "0", Estado "23", Terminal "a");
+      Arco_af (Estado "23", Estado "124", Terminal "b");
+      Arco_af (Estado "124", Estado "2", Terminal "a");
+      Arco_af (Estado "124", Estado "012", Terminal "b");
+      Arco_af (Estado "012", Estado "23", Terminal "a");
+      ],
+
+    Conjunto [Estado "0"; Estado "23"; Estado "124"; Estado "2"; Estado "012"]
+  );;
+*)
+
+
+(* Funciones auxiliares *)
+
+let avanza simbolo estados (Af (_, _, _, Conjunto arcos, _)) =
+
+   let rec aux destinos = function
+
+        [] -> destinos
+
+      | Arco_af (origen, destino, s) :: t ->
+           if (s = simbolo) && (pertenece origen estados) then
+              aux (agregar destino destinos) t
+           else
+              aux destinos t
+
+   in
+      aux conjunto_vacio arcos
+   ;;
+  
+
+let agregarV estados destinos = 
+	let aux = function
+		| [] -> destinos
+		| es :: tl -> agregar es destinos
+	in aux (list_of_conjunto estados);;
+	
+let sameFinals est1 est2 fin1 fin2 = 
+	let tieneFinales1 = ((cardinal (interseccion est1 fin1)) > 0) in let tieneFinales2 = ((cardinal (interseccion est2 fin2)) > 0) in
+	if tieneFinales1 && tieneFinales2 then true
+		else if not tieneFinales1 && not tieneFinales2 then true
+  		else false;;
+ 
+let get_E_transiciones (Af (_, alfabeto, inicial, arcos, finales)) estado= 
+	let arc = list_of_conjunto arcos in
+	let rec aux iniciales = function
+		| [] -> iniciales
+		| Arco_af (origen, destino, Terminal "") :: tl -> if (pertenece origen iniciales) && not (pertenece destino iniciales) 
+				then aux (agregar destino iniciales) arc else aux iniciales tl
+		| _ :: tl -> aux iniciales tl
+		in aux estado arc;; 
+
+let allVisited est1 est2 vis1 vis2 = 
+	if (incluido est1 vis1) && (incluido est2 vis2) then true else false ;;	
+(* Funcion del ejercicio*)
+
+let equivalentes (Af (_, alfabeto1, inicial1, arcos1, finales1) as a) (Af (_, alfabeto2, inicial2, arcos2, finales2) as b) = 
+	let alf = list_of_conjunto (union alfabeto1 alfabeto2) in
+	let rec aux vis1 vis2 estt1 estt2 = function
+		| [] -> true
+		| s::tl -> let est1 = get_E_transiciones a estt1 in let est2 = get_E_transiciones b estt2 in
+			 if sameFinals est1 est2 finales1 finales2 then (
+			 	print_string "sameFinals";
+				if (allVisited est1 est2 vis1 vis2) then (
+					print_string "allVisited"; 
+					if (aux (agregarV est1 vis1) (agregarV est2 vis2) (avanza s est1 a) (avanza s est2 b) tl)
+						then (print_string "if aux"; aux conjunto_vacio conjunto_vacio est1 est2 tl ) else (print_string "false1"; false)
+					) else (aux (agregarV est1 vis1) (agregarV est2 vis2) (avanza s est1 a) (avanza s est2 b) (s::tl))				 
+			) else (print_string "false2"; false)
+	in aux (conjunto_of_list []) (conjunto_of_list []) (conjunto_of_list [inicial1]) (conjunto_of_list [inicial2]) alf;;
+		
 (*-----------------------------------------------------------------------------------------------*)
 
 (* Ejercicio 3 *)
