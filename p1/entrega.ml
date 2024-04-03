@@ -124,6 +124,24 @@ let eq_afd = Af (
 
     Conjunto [Estado "0"; Estado "23"; Estado "124"; Estado "2"; Estado "012"]
   );;
+  
+let neq_afd = Af (
+    Conjunto [Estado "0"; Estado "23"; Estado "124"; Estado "2"; Estado "012"; Estado "fin"],
+
+    Conjunto [Terminal "a"; Terminal "b"],
+
+    Estado "0",
+
+    Conjunto [
+      Arco_af (Estado "0", Estado "23", Terminal "a");
+      Arco_af (Estado "23", Estado "fin", Terminal "b");
+      Arco_af (Estado "124", Estado "2", Terminal "a");
+      Arco_af (Estado "124", Estado "012", Terminal "b");
+      Arco_af (Estado "012", Estado "23", Terminal "a");
+      ],
+
+    Conjunto [Estado "0"; Estado "23"; Estado "124"; Estado "2"; Estado "012"]
+  );;
 *)
 
 
@@ -180,10 +198,9 @@ let equivalentes (Af (_, alfabeto1, inicial1, arcos1, finales1) as a) (Af (_, al
 			 	print_string "sameFinals";
 				if (allVisited est1 est2 vis1 vis2) then (
 					print_string "allVisited"; 
-					if (aux (agregarV est1 vis1) (agregarV est2 vis2) (avanza s est1 a) (avanza s est2 b) tl)
-						then (print_string "if aux"; aux conjunto_vacio conjunto_vacio est1 est2 tl ) else (print_string "false1"; false)
-					) else (aux (agregarV est1 vis1) (agregarV est2 vis2) (avanza s est1 a) (avanza s est2 b) (s::tl))				 
-			) else (print_string "false2"; false)
+					aux conjunto_vacio conjunto_vacio est1 est2 tl) else (
+					print_string "false1"; aux (agregarV est1 vis1) (agregarV est2 vis2) (avanza s est1 a) (avanza s est2 b) tl)) 			 
+			 else (print_string "false2"; false)
 	in aux (conjunto_of_list []) (conjunto_of_list []) (conjunto_of_list [inicial1]) (conjunto_of_list [inicial2]) alf;;
 		
 (*-----------------------------------------------------------------------------------------------*)
