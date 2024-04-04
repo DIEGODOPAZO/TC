@@ -62,6 +62,8 @@ let es_afd af =
 
 (* Elementos para probar*)
 
+(* Los tres primeros son equivalentes entre ellos, los dos ultimos no son equivalentes a ninguno*)
+
 (*
 let eq_afne = Af (
     Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"; Estado "4"],
@@ -142,6 +144,21 @@ let neq_afd = Af (
 
     Conjunto [Estado "0"; Estado "23"; Estado "124"; Estado "2"; Estado "012"]
   );;
+ let neq = Af (
+    Conjunto [Estado "0"; Estado "23"; Estado "124"; Estado "2"; Estado "012"; Estado "fin"],
+
+    Conjunto [Terminal "a"; Terminal "b"],
+
+    Estado "0",
+
+    Conjunto [
+      Arco_af (Estado "0", Estado "23", Terminal "a");
+      Arco_af (Estado "23", Estado "fin", Terminal "b");
+      Arco_af (Estado "012", Estado "23", Terminal "a");
+      ],
+
+    Conjunto [Estado "0"; Estado "23"; Estado "124"; Estado "2"; Estado "012"]
+  );;
 *)
 
 
@@ -189,19 +206,18 @@ let allVisited est1 est2 vis1 vis2 =
 	if (incluido est1 vis1) && (incluido est2 vis2) then true else false ;;	
 (* Funcion del ejercicio*)
 
-let equivalentes (Af (_, alfabeto1, inicial1, arcos1, finales1) as a) (Af (_, alfabeto2, inicial2, arcos2, finales2) as b) = 
+let equivalentes (Af (estados1, alfabeto1, inicial1, arcos1, finales1) as a) (Af (estados2, alfabeto2, inicial2, arcos2, finales2) as b) = 
 	let alf = list_of_conjunto (union alfabeto1 alfabeto2) in
-	let rec aux vis1 vis2 estt1 estt2 = function
+	let rec aux vis1 vis2 estt1 estt2 level alf = function
 		| [] -> true
 		| s::tl -> let est1 = get_E_transiciones a estt1 in let est2 = get_E_transiciones b estt2 in
 			 if sameFinals est1 est2 finales1 finales2 then (
-			 	print_string "sameFinals";
-				if (allVisited est1 est2 vis1 vis2) then (
-					print_string "allVisited"; 
-					aux conjunto_vacio conjunto_vacio est1 est2 tl) else (
-					print_string "false1"; aux (agregarV est1 vis1) (agregarV est2 vis2) (avanza s est1 a) (avanza s est2 b) tl)) 			 
-			 else (print_string "false2"; false)
-	in aux (conjunto_of_list []) (conjunto_of_list []) (conjunto_of_list [inicial1]) (conjunto_of_list [inicial2]) alf;;
+				if ((not (allVisited est1 est2 vis1 vis2)) && ((level < (cardinal arcos1)) && (level < (cardinal arcos2)))) then (
+					if (aux (agregarV est1 vis1) (agregarV est2 vis2) (avanza s est1 a) (avanza s est2 b) (level + 1) alf alf)
+					then (aux conjunto_vacio conjunto_vacio estt1 estt2 level alf tl) else false )else (
+					true ) )			 
+			 else (false)
+	in aux (conjunto_of_list []) (conjunto_of_list []) (conjunto_of_list [inicial1]) (conjunto_of_list [inicial2]) 0 alf alf;;
 		
 (*-----------------------------------------------------------------------------------------------*)
 
