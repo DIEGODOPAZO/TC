@@ -9,7 +9,6 @@ let rec e_transicion= function
 
 let rec indeterminismosE estado valor res valoresE valoresT estV= function
 	| [] ->  if (igual valoresE valoresT) then false else (if (pertenece estado estV) then false else true)
-	| Arco_af (_, _, Terminal "") :: tl -> false
 	| Arco_af (Estado est, Estado estRes, Terminal v) :: tl -> if est = estado && v = valor && estRes != res then true else (if est = estado then indeterminismosE estado valor res (agregar (Terminal v) valoresE) valoresT estV tl else indeterminismosE estado valor res valoresE valoresT estV tl)
 	| _ :: tl -> indeterminismosE estado valor res valoresE valoresT estV tl;;
 
@@ -30,7 +29,7 @@ let es_afne (Af (_, _, _, arcos, _)) =
   
 let es_afn af =
 	match af with 
-	| Af (estadosT, valoresT, _, arcos, _) -> indeterminismosL (estados_to_strings (conjunto_of_list []) (list_of_conjunto estadosT)) valoresT (conjunto_of_list []) (list_of_conjunto arcos);;
+	| Af (estadosT, valoresT, _, arcos, _) -> (not (es_afne af)) && indeterminismosL (estados_to_strings (conjunto_of_list []) (list_of_conjunto estadosT)) valoresT (conjunto_of_list []) (list_of_conjunto arcos);;
 	
 let es_afd af = 
 	not (es_afn af) && not (es_afne af);;
