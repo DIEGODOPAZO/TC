@@ -9,7 +9,7 @@ let rec e_transicion= function
 
 let rec indeterminismosE estado valor res valoresE valoresT estV= function
 	| [] ->  if (igual valoresE valoresT) then false else (if (pertenece estado estV) then false else true)
-	| Arco_af (_, _, Terminal "") :: tl -> indeterminismosE estado valor res valoresE valoresT estV tl (* or false si no se quiere q tenga e arcos*)
+	| Arco_af (_, _, Terminal "") :: tl -> false
 	| Arco_af (Estado est, Estado estRes, Terminal v) :: tl -> if est = estado && v = valor && estRes != res then true else (if est = estado then indeterminismosE estado valor res (agregar (Terminal v) valoresE) valoresT estV tl else indeterminismosE estado valor res valoresE valoresT estV tl)
 	| _ :: tl -> indeterminismosE estado valor res valoresE valoresT estV tl;;
 
