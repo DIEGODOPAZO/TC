@@ -18,7 +18,7 @@ let afnnn = af_of_string "0 1 2 3; a b c; 0; 1 3;
 let afnn = af_of_string "0 1 2 3; a b c; 0; 1 3;
 0 1 a; 0 2 b; 0 3 c; 1 3 c; 1 1 b; 1 2 a; 2 3 c; 2 1 a;";; 
 let afn = af_of_string "0 1 2 3; a b c; 0; 1 3;
-0 1 a; 1 1 b; 1 2 a; 2 3 c; 0 0 a;";; *)
+0 1 a; 1 1 b; 1 2 a; 2 3 c;";; *)
 
 (* funciones auxiliares *)
 let rec e_transicion= function 
@@ -226,7 +226,7 @@ let equivalentes (Af (estados1, alfabeto1, inicial1, arcos1, finales1) as a) (Af
 
 (* Elementos para las pruebas *)
 (* let afd = af_of_string "0 1 2 3; a b c; 0; 1 3;
-0 1 a; 1 1 b; 1 2 a; 2 3 c;";; 
+0 1 a; 1 1 b; 1 2 c;1 2 a; 2 3 c;";; 
 let afn = af_of_string "0 1 2 3; a b c ws; 0; 1 3;
 0 1 a; 1 1 b; 1 2 a; 2 3 c; 0 0 a; 0 3 ws;";; 
  let afn2 = af_of_string "0 1 2 3 4; a b c ws; 0; 4;
