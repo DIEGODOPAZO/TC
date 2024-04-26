@@ -116,7 +116,7 @@ cyk [Terminal "b"; Terminal "a"] klk;;
 (*true*)
 cyk [Terminal "a"; Terminal "b"; Terminal "a"; Terminal "b"; Terminal "a"] klk;;
 (*true*)
-cyk [Terminal "b"; Terminal "b"; Terminal "b"; Terminal "b"] klk;;
+cyk [Terminal "b"; Terminal "b"; Terminal "b"; Terminal "b"] klk;;
 (*false*)
 
 
@@ -165,8 +165,6 @@ let getNotTerminals s (Gic (_, _, p, _)) =
         else
           aux res tl
   in aux conjunto_vacio (list_of_conjunto p);;
-
-	
 	
 
 let initialiceFirstRow matrix simbolos (Gic (n, t, p, s) as gic) = 
@@ -175,10 +173,10 @@ let initialiceFirstRow matrix simbolos (Gic (n, t, p, s) as gic) =
 		| hd :: tl -> let res = getNotTerminals hd gic in 
 								let rec add = function
 									|[] -> None
-									|hdd :: tll -> matrix.(0).(index) <- hdd::matrix.(0).(index); add tll
+									|hdd :: tll -> matrix.(1).(index) <- hdd::matrix.(1).(index); add tll
 								in add res; 
 								aux (index + 1) tl;
-		in aux 0 simbolos;;  
+		in aux 1 simbolos;;  
 
 
 let producto_cartesiano lista1 lista2 =
@@ -198,9 +196,9 @@ let getNotTerminalNt (t, tt) p =
 	in aux [] (list_of_conjunto p);;
 
 
-let getAFromBC (Gic (n, t, p, s)) b c matrix= 
+let getAFromBC (Gic (n, t, p, s)) b c= 
 	let rec aux res = function
-		|[] -> res
+		|[] -> (list_of_conjunto res)
 		|h::tl -> let nres = (union res (conjunto_of_list (getNotTerminalNt h p))) in aux nres tl	
 	in aux conjunto_vacio (producto_cartesiano b c);;
 		
@@ -208,22 +206,46 @@ let getAFromBC (Gic (n, t, p, s)) b c matrix=
 (* Ejercicio 2 *)
 
 let cyk simbolos (Gic (n, t, p, s) as gic) = let len = (List.length simbolos) in
-	if (not (es_fnc gic)) || (len = 0) then raise (Failure "An error occurred") else (
-		let matrix = crear_matriz_de_listas len in let x = initialiceFirstRow matrix simbolos gic in
-			for j = 1 to (len - 1) do
-				for i = 0 to (len - j + 1) do
-					for k = 0 to (j - 1) do
-						(* aqui va mi funcion auxiliar*)
-						print_string "prueba"
+	if (not (es_fnc gic)) || (len = 0) then raise (Failure "Invalid GIC") else (
+		let matrix = crear_matriz_de_listas (len + 1) in let x = initialiceFirstRow matrix simbolos gic in
+			for j = 2 to (len) do
+				for i = 1 to (len - j + 1) do
+					for k = 1 to (j - 1) do
+						let values = (getAFromBC gic matrix.(k).(i) matrix.((j - k)).((i + k))) in
+							let rec app = function
+								| [] -> ()
+								| hd :: tl -> matrix.(j).(i) <- hd::matrix.(j).(i); app tl 
+							in app values;
 					done;
 				done;
 			done;
+			print_matrix matrix;
+			let rec aux = function
+				|[] -> false
+				| (No_terminal hd)::tl -> print_endline ("hd: " ^ hd); if (No_terminal hd) = s then true else aux tl
+			in aux matrix.(len).((1))
 	) ;;
 
 
+let print_matrix matrix =
+  Array.iter (fun row ->
+    Array.iter (fun elem ->
+      List.iter (fun symbol ->
+        match symbol with
+        | Terminal s -> print_string ("Terminal " ^ s ^ " ")
+        | No_terminal s -> print_string ("No_terminal " ^ s ^ " ")
+      ) elem;
+      print_string " | "   (* Separador entre elementos de la fila *)
+    ) row;
+    print_endline ""   (* Nueva línea al final de cada fila *)
+  ) matrix;;
 
-
-
-
-
-
+let print_symbol_list symbol_list =
+  List.iter (fun symbol ->
+    match symbol with
+    | Terminal s -> print_string ("Terminal " ^ s ^ " ")
+    | No_terminal s -> print_string ("No_terminal " ^ s ^ " ")
+  ) symbol_list;
+  print_endline "";;
+  
+  
