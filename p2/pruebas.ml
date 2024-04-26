@@ -3,6 +3,7 @@ open Conj;;
 open Auto;;
 open Ergo;;
 open Graf;;
+open Array;;
 
 (* Pruebas de Badillo*)
 
@@ -147,8 +148,77 @@ let es_fnc (Gic (n, t, p, s) as gic) =
 		| _ -> false 
 	in aux (list_of_conjunto p);;
 	
+	
+	
+(* Ejercicio 2 funciones auxiliares*)
+let crear_matriz_de_listas n =
+  Array.init n (fun _ -> Array.init n (fun _ -> []));;
+  
+  
+	
+let getNotTerminals s (Gic (_, _, p, _)) = 
+  let rec aux res = function
+    | [] -> (list_of_conjunto res)
+    | Regla_gic (nt, symbols)::tl -> 
+        if List.mem s symbols then
+          aux (agregar nt res) tl
+        else
+          aux res tl
+  in aux conjunto_vacio (list_of_conjunto p);;
+
+	
+	
+
+let initialiceFirstRow matrix simbolos (Gic (n, t, p, s) as gic) = 
+	let rec aux index = function
+		| [] -> None
+		| hd :: tl -> let res = getNotTerminals hd gic in 
+								let rec add = function
+									|[] -> None
+									|hdd :: tll -> matrix.(0).(index) <- hdd::matrix.(0).(index); add tll
+								in add res; 
+								aux (index + 1) tl;
+		in aux 0 simbolos;;  
 
 
+let producto_cartesiano lista1 lista2 =
+  let resultado = ref [] in
+  for i = 0 to List.length lista1 - 1 do
+    for j = 0 to List.length lista2 - 1 do
+      resultado := (List.nth lista1 i, List.nth lista2 j) :: !resultado
+    done;
+  done;
+  !resultado
+
+let getNotTerminalNt (t, tt) p =
+	let rec aux res= function
+		|[] -> res
+		|Regla_gic (nt, [No_terminal x; No_terminal y])::tl -> if ( (No_terminal x) = t) && ( (No_terminal y) = tt) then aux (nt::res) tl else aux res tl
+		| _ :: tl -> aux res tl
+	in aux [] (list_of_conjunto p);;
+
+
+let getAFromBC (Gic (n, t, p, s)) b c matrix= 
+	let rec aux res = function
+		|[] -> res
+		|h::tl -> let nres = (union res (conjunto_of_list (getNotTerminalNt h p))) in aux nres tl	
+	in aux conjunto_vacio (producto_cartesiano b c);;
+		
+
+(* Ejercicio 2 *)
+
+let cyk simbolos (Gic (n, t, p, s) as gic) = let len = (List.length simbolos) in
+	if (not (es_fnc gic)) || (len = 0) then raise (Failure "An error occurred") else (
+		let matrix = crear_matriz_de_listas len in let x = initialiceFirstRow matrix simbolos gic in
+			for j = 1 to (len - 1) do
+				for i = 0 to (len - j + 1) do
+					for k = 0 to (j - 1) do
+						(* aqui va mi funcion auxiliar*)
+						print_string "prueba"
+					done;
+				done;
+			done;
+	) ;;
 
 
 
