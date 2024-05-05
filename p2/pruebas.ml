@@ -103,7 +103,7 @@ es_fnc klk4;;
 (*false*)
 es_fnc klk5;;
 (*false*)
-es_fnc klk7;;
+es_fnc klk6;;
 (*false*)
 es_fnc klk7;;
 (*false*)
